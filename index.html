@@ -34,7 +34,7 @@
         display.innerText = slider.value;
         const gainParam = whiteNoiseNode.parameters.get("customGain");
         // gainParam.setValueAtTime(slider.value + 1, audioContext.currentTime);
-        gainParam.linearRampToValueAtTime(slider.value + 1, audioContext.currentTime + 1);
+        gainParam.linearRampToValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime + 1);
       })
       document.addEventListener("keydown", (e) => {
         if (e.key === "p") {
