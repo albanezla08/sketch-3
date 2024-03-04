@@ -6,7 +6,7 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
         {
           name: "customGain",
           defaultValue: 1,
-          minValue: 0,
+          minValue: -1,
           maxValue: 1,
           automationRate: "a-rate",
         },
