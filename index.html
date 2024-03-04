@@ -8,7 +8,8 @@
 </body>
 <script>
   
-
+  const slider = document.getElementById("slider");
+  const display = document.getElementById("display");
 
   async function start () {
       const audioContext = new AudioContext();
@@ -20,19 +21,21 @@
         "white-noise-processor",
       );
       whiteNoiseNode.connect(audioContext.destination);
-      setTimeout(() => change(whiteNoiseNode, audioContext), 1000);
+      slider.addEventListener("input", () => {
+        display.innerText = slider.value;
+        const gainParam = whiteNoiseNode.parameters.get("customGain");
+        gainParam.setValueAtTime(0, slider.value);
+      })
   }
 
-  function change (whiteNoiseNode, audioContext) {
-    console.log("ran");
-    const gainParam = whiteNoiseNode.parameters.get("customGain");
-    console.log(gainParam);
-    gainParam.setValueAtTime(0, audioContext.currentTime);
-    gainParam.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.5);
-  }
+  // function change (whiteNoiseNode, audioContext) {
+  //   console.log("ran");
+  //   const gainParam = whiteNoiseNode.parameters.get("customGain");
+  //   console.log(gainParam);
+  //   gainParam.setValueAtTime(0, audioContext.currentTime);
+  //   gainParam.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.5);
+  // }
 
-document.addEventListener("click", start);
-  
-// recurse();
+  document.addEventListener("click", start);
 
 </script>
