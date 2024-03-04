@@ -39,7 +39,7 @@
             const gainParam = whiteNoiseNode.parameters.get("customGain");
             gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
             i++;
-            setTimeout(wave, 10);
+            setTimeout(wave, 1);
           }
           wave();
         }
