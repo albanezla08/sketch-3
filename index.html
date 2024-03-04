@@ -65,7 +65,7 @@ sound.connect(ctx.destination)
 // sound.start(0)
 // sound.stop(0.5)
   
-sound.start();
+// sound.start();
   
 function change () {
   for (let i = 0; i < data.length; i++) {
@@ -118,6 +118,18 @@ slider.addEventListener("input", () => {
 //   // time += sound.duration;
 //   requestAnimationFrame(recurse);
 // }
+
+  async function start () {
+    const audioContext = new AudioContext();
+    await audioContext.audioWorklet.addModule("white-noise-processor.js");
+    const whiteNoiseNode = new AudioWorkletNode(
+      audioContext,
+      "white-noise-processor",
+    );
+    whiteNoiseNode.connect(audioContext.destination);
+}
+
+start();
   
 // recurse();
 
