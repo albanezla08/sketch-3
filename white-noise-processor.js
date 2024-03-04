@@ -5,6 +5,7 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
       super();
       this.currentValue = 0;
       this.phase = 0;
+      this.getValue = this.getValue;
     }
 
     static get parameterDescriptors() {

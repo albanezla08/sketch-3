@@ -17,9 +17,11 @@
   const display = document.getElementById("display");
 
   let i = 0;
+  let startTime;
 
   async function start () {
       const audioContext = new AudioContext();
+      startTime = audioContext.currentTime + 0.01;
       console.log("before");
       await audioContext.audioWorklet.addModule("white-noise-processor.js");
       console.log("after");
@@ -45,8 +47,9 @@
         }
       })
       function moveSlider() {
-        console.log(whiteNoiseNode.currentValue);
-        slider.value = whiteNoiseNode.currentValue;
+        const index = ((audioContext.currentTime - startTime) * audioContext.sampleRate).toFixed(0);
+        console.log(index);
+        slider.value = index;
         moveSlider();
       }
       setTimeout(moveSlider, 1000);
