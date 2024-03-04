@@ -45,8 +45,8 @@
         }
       })
       function moveSlider() {
-        console.log(whiteNoiseNode.getValue);
-        slider.value = whiteNoiseNode.getValue();
+        console.log(whiteNoiseNode.currentValue);
+        slider.value = whiteNoiseNode.currentValue;
         moveSlider();
       }
       setTimeout(moveSlider, 1000);
