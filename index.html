@@ -33,14 +33,15 @@
       slider.addEventListener("input", () => {
         display.innerText = slider.value;
         const gainParam = whiteNoiseNode.parameters.get("customGain");
-        // gainParam.setValueAtTime(slider.value + 1, audioContext.currentTime);
-        gainParam.linearRampToValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime + 1);
+        gainParam.setValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime);
+        // gainParam.linearRampToValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime + 1);
       })
       document.addEventListener("keydown", (e) => {
         if (e.key === "p") {
           function wave() {
             const gainParam = whiteNoiseNode.parameters.get("customGain");
             gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
+            slider.value = Math.sin(i * 0.0576);
             i++;
             setTimeout(wave, 1);
           }
