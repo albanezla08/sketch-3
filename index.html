@@ -35,7 +35,13 @@
       })
       document.addEventListener("keydown", (e) => {
         if (e.key === "p") {
-          gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
+          function wave() {
+            const gainParam = whiteNoiseNode.parameters.get("customGain");
+            gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
+            i++;
+            setTimeout(wave, 10);
+          }
+          wave();
         }
       })
   }
