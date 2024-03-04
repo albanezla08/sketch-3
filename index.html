@@ -33,7 +33,8 @@
       slider.addEventListener("input", () => {
         display.innerText = slider.value;
         const gainParam = whiteNoiseNode.parameters.get("customGain");
-        gainParam.setValueAtTime(slider.value + 1, audioContext.currentTime);
+        // gainParam.setValueAtTime(slider.value + 1, audioContext.currentTime);
+        gainParam.linearRampToValueAtTime(slider.value + 1, audioContext.currentTime + 1);
       })
       document.addEventListener("keydown", (e) => {
         if (e.key === "p") {
@@ -52,7 +53,7 @@
         slider.value = index;
         moveSlider();
       }
-      setTimeout(moveSlider, 1000);
+      // setTimeout(moveSlider, 1000);
   }
 
   // function change (whiteNoiseNode, audioContext) {
