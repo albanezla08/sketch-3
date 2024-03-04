@@ -40,7 +40,7 @@
         if (e.key === "p") {
           function wave() {
             const gainParam = whiteNoiseNode.parameters.get("customGain");
-            gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
+            gainParam.setValueAtTime((Math.sin(i * 0.0576) + 1) * 0.9, audioContext.currentTime);
             slider.value = Math.sin(i * 0.0576);
             i++;
             setTimeout(wave, 1);
