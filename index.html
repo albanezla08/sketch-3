@@ -44,6 +44,12 @@
           wave();
         }
       })
+      function moveSlider() {
+        console.log(whiteNoiseNode.getValue);
+        slider.value = whiteNoiseNode.getValue();
+        moveSlider();
+      }
+      setTimeout(moveSlider, 1000);
   }
 
   // function change (whiteNoiseNode, audioContext) {
