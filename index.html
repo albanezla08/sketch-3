@@ -16,6 +16,8 @@
   const slider = document.getElementById("slider");
   const display = document.getElementById("display");
 
+  let i = 0;
+
   async function start () {
       const audioContext = new AudioContext();
       console.log("before");
@@ -29,7 +31,12 @@
       slider.addEventListener("input", () => {
         display.innerText = slider.value;
         const gainParam = whiteNoiseNode.parameters.get("customGain");
-        gainParam.setValueAtTime(slider.value, audioContext.currentTime);
+        gainParam.setValueAtTime(slider.value + 1, audioContext.currentTime);
+      })
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "p") {
+          gainParam.setValueAtTime(Math.sin(i * 0.0576) + 1, audioContext.currentTime);
+        }
       })
   }
 
@@ -42,5 +49,6 @@
   // }
 
   document.addEventListener("click", start);
+
 
 </script>

@@ -6,8 +6,8 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
         {
           name: "customGain",
           defaultValue: 1,
-          minValue: -1,
-          maxValue: 1,
+          minValue: 0,
+          maxValue: 2,
           automationRate: "a-rate",
         },
       ];
@@ -19,6 +19,7 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
         for (let i = 0; i < channel.length; i++) {
           channel[i] =
             // (Math.random() * 2 - 1) *
+            -1 +
             (parameters["customGain"].length > 1
               ? parameters["customGain"][i]
               : parameters["customGain"][0]);
