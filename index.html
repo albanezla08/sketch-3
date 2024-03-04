@@ -24,7 +24,7 @@
       slider.addEventListener("input", () => {
         display.innerText = slider.value;
         const gainParam = whiteNoiseNode.parameters.get("customGain");
-        gainParam.setValueAtTime(0, slider.value);
+        gainParam.setValueAtTime(slider.value, audioContext.currentTime);
       })
   }
 
