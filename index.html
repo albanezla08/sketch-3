@@ -1,71 +1,296 @@
 <body>
-  <div class="slider-container">
-    <input type="range" min="-1" max="1" value="0" step="0.001" class="slider" id="slider">
+  <h1>Make a Sound/Compression</h1>
+  <!-- Tab links -->
+  <div class="tab">
+    <button class="tablinks active" onclick="openTab(event, 'choose-note')">Choose a Note</button>
+    <button class="tablinks" onclick="openTab(event, 'draw-wave')">Draw a Wave</button>
   </div>
-  <p id="display">
-    
-  </p>
+
+  <!-- Tab content -->
+  <div id="choose-note-content" class="tabcontent" style="display: block;">
+    <p>Automatically draw this note on the canvas and hear it played. If you choose to play the sound with the play button below, you'll hear more digital artifacts as you decrease the canvas width.</p>
+    <button onclick="createBufferFromNote('C4')">C4</button>
+    <button onclick="createBufferFromNote('C#4')">C#4</button>
+    <button onclick="createBufferFromNote('D4')">D4</button>
+    <button onclick="createBufferFromNote('D#4')">D#4</button>
+    <button onclick="createBufferFromNote('E4')">E4</button>
+    <button onclick="createBufferFromNote('F4')">F4</button>
+    <button onclick="createBufferFromNote('F#4')">F#4</button>
+    <button onclick="createBufferFromNote('G4')">G4</button>
+    <button onclick="createBufferFromNote('G#4')">G#4</button>
+    <button onclick="createBufferFromNote('A4')">A4</button>
+    <button onclick="createBufferFromNote('A#4')">A#4</button>
+    <button onclick="createBufferFromNote('B4')">B4</button>
+  </div>
+
+  <div id="draw-wave-content" class="tabcontent">
+    <p>You can draw on the canvas to change the sound wave at any time. Press 'Play from Wave' at the bottom to play a sound wave similar to the shape drawn on the canvas.</p>
+    <button onclick="clearCanvas()">Clear Canvas</button>
+  </div>
+
+  <!-- text field for  -->
+  <span>Sound Length: </span>
+  <input type="text" id="sound-length" value="1">
+  <br />
+  <br />
+  <span>Canvas Width: </span>
+  <input type="text" id="canvas-width" value="500">
+
+  <br />
+  <br />
+
+  <canvas></canvas>
+
+  <br />
+  <br />
+
+  <button id="play-button" onclick="play()">Play from Wave</button>
 </body>
 <style>
+  body {
+    background-color: #fff0db;
+  }
   input {
     width: 100%;
+  }
+  span {
+    float: left;
+    margin-right: 1%;
+  }
+  h1 {
+    text-align: center;
+  }
+  #sound-length {
+    width: 70%;
+    float: left;
+  }
+  #canvas-width {
+    width: 70%;
+    float: left;
+  }
+  /* Tab selection from W3 schools example */
+  .tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+  }
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+  }
+  .tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+  }
+  .tab button.active {
+    background-color: #ccc;
   }
 </style>
 <script>
   
-  const slider = document.getElementById("slider");
-  const display = document.getElementById("display");
+  let soundLength = 1;
+  const ctx = new window.AudioContext()
 
-  let i = 0;
-  let startTime;
-
-  async function start () {
-      const audioContext = new AudioContext();
-      startTime = audioContext.currentTime + 0.01;
-      console.log("before");
-      await audioContext.audioWorklet.addModule("white-noise-processor.js");
-      console.log("after");
-      const whiteNoiseNode = new AudioWorkletNode(
-        audioContext,
-        "white-noise-processor",
-      );
-      whiteNoiseNode.connect(audioContext.destination);
-      slider.addEventListener("input", () => {
-        display.innerText = slider.value;
-        const gainParam = whiteNoiseNode.parameters.get("customGain");
-        gainParam.setValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime);
-        // gainParam.linearRampToValueAtTime(parseInt(slider.value) + 1, audioContext.currentTime + 1);
-      })
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "p") {
-          function wave() {
-            const gainParam = whiteNoiseNode.parameters.get("customGain");
-            gainParam.setValueAtTime((Math.sin(i * 0.0576) + 1) * 0.9, audioContext.currentTime);
-            slider.value = Math.sin(i * 0.0576);
-            i++;
-            setTimeout(wave, 1);
-          }
-          wave();
-        }
-      })
-      function moveSlider() {
-        const index = ((audioContext.currentTime - startTime) * audioContext.sampleRate).toFixed(0);
-        console.log(index);
-        slider.value = index;
-        moveSlider();
-      }
-      // setTimeout(moveSlider, 1000);
+  function createSoundBuffer() {
+    return ctx.createBuffer(2, ctx.sampleRate * soundLength, ctx.sampleRate);
   }
 
-  // function change (whiteNoiseNode, audioContext) {
-  //   console.log("ran");
-  //   const gainParam = whiteNoiseNode.parameters.get("customGain");
-  //   console.log(gainParam);
-  //   gainParam.setValueAtTime(0, audioContext.currentTime);
-  //   gainParam.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.5);
-  // }
+  function init() {
+    const data = createSoundBuffer();
+    const leftChannel = data.getChannelData(0);
+    clearCanvas();
+    setBuffer(leftChannel);
+    setWaveFromBuffer(leftChannel);
+  }
 
-  document.addEventListener("click", start);
 
+  function setBuffer(channel) {
+    for (let i = 0; i < channel.length; i++) {
+      channel[i] = Math.sin(i * 0.0576);
+    }
+  }
+
+  function playSound(data) {
+    const sound = ctx.createBufferSource()
+    sound.buffer = data;
+    sound.connect(ctx.destination)
+    sound.start(0)
+  }
+
+  const canvas = document.querySelector('canvas');
+  canvas.width = 500;
+  canvas.height = 300;
+  const cc = canvas.getContext('2d');
+
+  cc.lineWidth = 2;
+
+  function calcYPos(canvas, amplitude) {
+    return canvas.height / 2 * (amplitude + 1);
+  }
+
+  function openTab(event, name) {
+    const id = name + '-content';
+    document.querySelectorAll('.tabcontent').forEach((elem) => {
+      if (elem.id === id) {
+        elem.style = 'display: block;';
+      } else {
+        elem.style = '';
+      }
+    });
+    document.querySelectorAll('.tablinks').forEach((elem) => {
+      elem.classList.toggle('active');
+    })
+  }
+
+  function clearCanvas() {
+    cc.beginPath();
+    cc.fillStyle = 'white';
+    cc.fillRect(0, 0, canvas.width, canvas.height);
+    cc.closePath();
+  }
+
+  function setWaveFromBuffer(channel) {
+    cc.beginPath();
+    cc.moveTo(0, calcYPos(canvas, channel[0]));
+    for (let i = 1; i < canvas.width; i++) {
+      const percent = i / canvas.width;
+      const index = Math.floor(channel.length * percent);
+      const yPos = calcYPos(canvas, channel[index]);
+      cc.lineTo(i, yPos);
+    }
+    cc.stroke();
+    cc.closePath();
+  }
+
+  // setWaveFromBuffer(leftChannel);
+
+  function calcSineWave (note, i) {
+    const note2freq = {
+      'C4': 261.63,
+      'C#4': 277.18,
+      'D4': 293.66,
+      'D#4': 311.13,
+      'E4': 329.63,
+      'F4': 349.23,
+      'F#4': 369.99,
+      'G4': 392,
+      'G#4': 415.3,
+      'A4': 440,
+      'A#4': 466.16,
+      'B4': 493.88
+    }
+    const freq = note2freq[note]
+    const angularFrequency = (freq * 2 * Math.PI) / ctx.sampleRate
+    return Math.sin(i * angularFrequency)
+  }
+  function setBufferToNote(note, channel) {
+    for (let i = 0; i < channel.length; i++) {
+      channel[i] = calcSineWave(note, i);
+    }
+    setWaveFromBuffer(channel);
+  }
+
+  function createBufferFromNote(note) {
+    const data = createSoundBuffer();
+    setBufferToNote(note, data.getChannelData(0));
+    playSound(data);
+  }
+
+  function onMouseDownCanvas(e) {
+    const cx = e.x - canvas.offsetLeft;
+    const cy = e.y - canvas.offsetTop;
+    cc.beginPath();
+    cc.moveTo(cx, cy);
+    canvas.addEventListener('mousemove', onMouseMoveCanvas);
+    document.addEventListener('mouseup', onMouseUpCanvas);
+  }
+  function onMouseMoveCanvas(e) {
+    const cx = e.x - canvas.offsetLeft;
+    const cy = e.y - canvas.offsetTop;
+    cc.lineTo(cx, cy);
+    cc.stroke();
+  }
+  function onMouseUpCanvas(e) {
+    cc.closePath();
+    canvas.removeEventListener('mousemove', onMouseMoveCanvas);
+    document.removeEventListener('mouseup', onMouseUpCanvas);
+  }
+
+  function updateSoundLength() {
+    const tempSoundLength = parseFloat(document.getElementById('sound-length').value);
+    if (tempSoundLength === NaN) {
+      return;
+    }
+    soundLength = tempSoundLength;
+    const data = ctx.createBuffer(2, ctx.sampleRate * soundLength, ctx.sampleRate);
+    const leftChannel = data.getChannelData(0);
+    setBuffer(leftChannel);
+    setWaveFromBuffer(leftChannel);
+    playSound(data);
+  }
+
+  function updateCanvasWidth() {
+    const canvasWidth = parseFloat(document.getElementById('canvas-width').value);
+    if (canvasWidth === NaN) {
+      return;
+    }
+    canvas.width = canvasWidth;
+    init();
+  }
+
+  function isPixelBlack(pixelData) {
+    return pixelData[0] === 0 && pixelData[1] === 0 && pixelData[2] === 0 && pixelData[3] === 255;
+  }
+
+  function play() {
+    const soundLength = parseFloat(document.getElementById('sound-length').value);
+    const soundData = ctx.createBuffer(2, ctx.sampleRate * soundLength, ctx.sampleRate);
+    const leftChannel = soundData.getChannelData(0);
+
+    const amplitudes = Array(canvas.width);
+
+    const imageData = cc.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let i = 0; i < canvas.width * 4; i += 4) {
+      let sum = 0;
+      let count = 0;
+      for (let j = i; j < canvas.height * canvas.width * 16; j += canvas.width * 4) {
+        let isBlack = isPixelBlack(imageData.slice(j, j+4));
+        if (isBlack) {
+          const yPos = j / (canvas.width * 4);
+          sum += yPos;
+          count++;
+        }
+      }
+      const averagePos = sum / count;
+      const percent = averagePos / canvas.height;
+      let amplitude = percent * 2 - 1;
+      if (count === 0) {
+        amplitude = 0;
+      }
+      amplitudes[i / 4] = amplitude;
+    }
+    for (let i = 0; i < leftChannel.length; i++) {
+      const percent = i / leftChannel.length;
+      const amplitude = amplitudes[Math.floor(percent * amplitudes.length)];
+      leftChannel[i] = amplitude;
+    }
+    console.log(leftChannel);
+    console.log(soundData);
+    playSound(soundData);
+  }
+
+  canvas.addEventListener('mousedown', onMouseDownCanvas);
+
+  document.getElementById('sound-length').addEventListener('change', updateSoundLength);
+  document.getElementById('canvas-width').addEventListener('change', updateCanvasWidth);
+
+  init();
 
 </script>
