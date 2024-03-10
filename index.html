@@ -191,6 +191,7 @@
   }
 
   /* User input functions */
+  /* Drawing on the canvas functions were heavily inspired by Jon Myers on https://codepen.io/jon-myers/pen/zYvPrZb */
   function onMouseDownCanvas(e) {
     const cx = e.x - canvas.offsetLeft;
     const cy = e.y - canvas.offsetTop;
@@ -228,6 +229,7 @@
   }
 
   /* Play a sound based on the canvas */
+  /* This function comes in large part from https://stackoverflow.com/questions/36891585/check-to-see-if-pixel-is-black-on-html5-canvas */
   function isPixelBlack(pixelData) {
     return pixelData[0] === 0 && pixelData[1] === 0 && pixelData[2] === 0 && pixelData[3] === 255;
   }
